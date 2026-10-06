@@ -6,6 +6,7 @@ const PUBLIC_PAGES = [
   "/",
   "/login",
   "/register",
+  "/lead-gate",
 ];
 
 const PUBLIC_API = [
@@ -13,6 +14,7 @@ const PUBLIC_API = [
   "/api/auth/register",
   "/api/auth/me",
   "/api/auth/logout",
+  "/api/lead",
 ];
 
 function matchesPath(pathname: string, path: string) {

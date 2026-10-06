@@ -31,16 +31,20 @@ export default function LeadGatePage() {
     setError("");
 
     try {
-      const response = await fetch(APPS_SCRIPT_URL, {
+      const response = await fetch("/api/lead", {
         method: "POST",
         headers: {
-          "Content-Type": "text/plain;charset=utf-8"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error("Request gagal");
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.success) {
+        throw new Error(
+          result?.error || "Data gagal dikirim ke Google Sheets."
+        );
       }
 
       setSuccess(true);
@@ -53,6 +57,171 @@ export default function LeadGatePage() {
 
   return (
     <main className="lead-page">
+      <style>{`
+  .lead-page {
+    min-height: 100svh;
+    width: 100%;
+    box-sizing: border-box;
+    display: grid;
+    place-items: center;
+    padding: 40px 20px;
+    margin: 0;
+    background:
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(255, 87, 87, 0.08),
+        transparent 42%
+      ),
+      #07090d;
+    color: #f5f5f5;
+  }
+
+  .lead-card {
+    width: min(520px, 100%);
+    box-sizing: border-box;
+    padding: 34px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 22px;
+    background: rgba(13,17,24,.96);
+    box-shadow:
+      0 24px 80px rgba(0,0,0,.42),
+      0 0 0 1px rgba(255,255,255,.02);
+  }
+
+  .lead-kicker {
+    margin: 0 0 10px;
+    color: #ff5757;
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: .14em;
+  }
+
+  .lead-card h1 {
+    margin: 0 0 12px;
+    color: #fff;
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.04;
+    letter-spacing: -.035em;
+  }
+
+  .lead-desc {
+    margin: 0 0 26px;
+    color: rgba(255,255,255,.68);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .lead-form {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .lead-form label {
+    display: grid;
+    gap: 8px;
+    width: 100%;
+    color: rgba(255,255,255,.78);
+    font-size: 13px;
+    line-height: 1.3;
+    font-weight: 700;
+  }
+
+  .lead-form input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 50px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    outline: none;
+    background: #090c11;
+    color: #fff;
+    font: inherit;
+    font-size: 15px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .lead-form input::placeholder {
+    color: rgba(255,255,255,.34);
+  }
+
+  .lead-form input:focus {
+    border-color: rgba(255,87,87,.72);
+    box-shadow: 0 0 0 3px rgba(255,87,87,.10);
+  }
+
+  .lead-gate-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 4px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    border: 0;
+    border-radius: 12px;
+    background: #ff5757;
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .01em;
+    cursor: pointer;
+  }
+
+  .lead-gate-submit:disabled {
+    opacity: .65;
+    cursor: wait;
+  }
+
+  .lead-gate-note {
+    display: block;
+    margin-top: 16px;
+    color: rgba(255,255,255,.42);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .lead-gate-success-icon {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 18px;
+    border-radius: 50%;
+    background: rgba(255,87,87,.12);
+    color: #ff5757;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .lead-gate-link {
+    text-decoration: none;
+  }
+
+  @media (max-width: 560px) {
+    .lead-page {
+      min-height: 100svh;
+      padding: 20px 14px;
+      align-items: center;
+    }
+
+    .lead-card {
+      padding: 25px 20px;
+      border-radius: 18px;
+    }
+
+    .lead-card h1 {
+      font-size: 34px;
+    }
+  }
+`}</style>
       <div className="lead-card">
         {!success ? (
           <>
