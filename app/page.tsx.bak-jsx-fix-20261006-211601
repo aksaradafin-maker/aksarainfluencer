@@ -1,0 +1,360 @@
+import type { Metadata } from "next";
+import type { CSSProperties } from "react";
+import "./landing.css";
+import { db } from "@/lib/db";
+import { OFFER } from "./offer.config";
+import SalesCountdown from "./components/SalesCountdown";
+import VisitorOffer from "./components/VisitorOffer";
+import VideoShowcase from "./components/VideoShowcase";
+import CtaTracker from "./components/CtaTracker";
+import LeadGate from "./components/LeadGate";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "AI Influencer Workflow untuk Karyawan | Rizmago Lab Studio",
+  description:
+    "Pelajari workflow membuat AI Influencer dan video konten dari nol, tanpa harus tampil di depan kamera.",
+  openGraph: {
+    title: "AI Influencer Workflow untuk Karyawan",
+    description: "Dari karakter AI sampai video siap posting. Praktik dari nol.",
+    type: "website",
+  },
+};
+
+type Settings = {
+  early_bird_price: number;
+  early_bird_status: string;
+  current_price: number;
+  current_regular_price: number;
+  next_batch_price: number;
+  countdown_enabled: number;
+  countdown_minutes: number;
+  background_type: "color" | "image" | "video";
+  background_media_url: string;
+  background_color: string;
+  background_overlay_color: string;
+  background_overlay_opacity: number;
+  accent_color: string;
+  danger_color: string;
+  container_max_width: number;
+  container_radius: number;
+  container_opacity: number;
+  container_border_opacity: number;
+  page_surface_color: string;
+};
+
+const STEPS = [
+  ["CREATE CHARACTER", "Bangun AI Influencer yang bisa digunakan secara konsisten untuk kebutuhan konten."],
+  ["SETUP CONTENT", "Tentukan produk, konsep, script, visual, dan format sebelum generate."],
+  ["GENERATE VIDEO", "Ikuti workflow untuk mengubah konsep menjadi video AI."],
+  ["POSTING", "Siapkan output untuk TikTok, Reels, Shorts, atau kebutuhan konten lainnya."],
+];
+
+const PERKS = [
+  ["+", "Garansi Bimbingan", "Bukan ditinggal setelah checkout. Ada bimbingan untuk membantu menjalankan workflow."],
+  ["\u21bb", "Free Update Materi", "Materi terus diperbarui mengikuti perkembangan workflow dan tools AI."],
+  ["01", "Tools Gratis & Berbayar", "Mulai dari tools yang tersedia gratis, lalu upgrade ketika kebutuhanmu berkembang."],
+  ["AI", "AI Influencer sebagai Fokus", "Fokus pada workflow pembuatan karakter AI sampai menjadi konten yang siap digunakan."],
+  ["\u2192", "Praktik dari Nol", "Bukan sekadar teori. Kamu tahu langkah berikutnya yang harus dilakukan."],
+];
+
+const money = (v: number) =>
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(v || 0));
+
+async function getSettings() {
+  const [rows] = await db.query(
+    "SELECT * FROM sales_page_settings WHERE is_published = 1 ORDER BY id ASC LIMIT 1"
+  );
+  return (Array.isArray(rows) ? rows[0] : undefined) as Settings | undefined;
+}
+
+export default async function HomePage() {
+  const s = await getSettings();
+
+  if (!s) {
+    return (
+      <main className="sales-page">
+        <div className="sales-empty">Sales page belum dipublish.</div>
+      </main>
+    );
+  }
+
+  const now = money(s.current_price);
+  const next = money(s.next_batch_price);
+  const visitor = OFFER.visitorWindow;
+
+  const pageStyle = {
+    "--sales-accent": s.accent_color,
+    "--sales-danger": s.danger_color,
+    "--sales-bg": s.background_color,
+    "--sales-overlay": s.background_overlay_color,
+    "--sales-overlay-opacity": String(s.background_overlay_opacity),
+    "--sales-surface": s.page_surface_color,
+    "--sales-container-width": s.container_max_width + "px",
+    "--sales-radius": s.container_radius + "px",
+    "--sales-container-opacity": String(s.container_opacity),
+    "--sales-border-opacity": String(s.container_border_opacity),
+  } as CSSProperties;
+
+  return (
+    <main className={"sales-page sales-bg-" + s.background_type} style={pageStyle}>
+      <CtaTracker />
+
+      <div className="sales-background">
+        {s.background_type === "image" && s.background_media_url ? (
+          <div className="sales-background-image" style={{ backgroundImage: 'url("' + s.background_media_url + '")' }} />
+        ) : null}
+        {s.background_type === "video" && s.background_media_url ? (
+          <video className="sales-background-video" autoPlay muted loop playsInline src={s.background_media_url} />
+        ) : null}
+        <div className="sales-background-overlay" />
+        <div className="sales-background-grid" />
+      </div>
+
+      <header className="sales-nav">
+        <div className="sales-nav-inner">
+          <a href="/" className="sales-brand">
+            <strong>RIZMAGO</strong>
+            <span>LAB STUDIO</span>
+          </a>
+          <div className="sales-nav-right">
+            <a href="#workflow">Workflow</a>
+            <a href="#showcase">Contoh</a>
+            <LeadGate className="sales-nav-cta">MULAI AJA DULU &rarr;</LeadGate>
+          </div>
+        </div>
+      </header>
+
+      <section className="sales-hero">
+        <div className="sales-container hero-container">
+          <div className="hero-copy">
+            <div className="sales-kicker">AI INFLUENCER WORKFLOW / UNTUK KARYAWAN</div>
+
+            <h1>
+              Karyawan yang
+              <br />
+              <span className="hero-accent">sudah jenuh?</span>
+            </h1>
+
+            <p className="hero-description">
+              Kerja 9&ndash;5. Pulang capek.
+              <br />
+              Besok masuk lagi.
+              <br />
+              Tapi di kepala masih ada keinginan buat mulai bikin sesuatu sendiri.
+            </p>
+
+            <p className="hero-description hero-description-second">
+              Mau ngonten, tapi nggak punya waktu, nggak punya kamera, dan nggak mau harus tampil di depan kamera
+              setiap hari?
+              <br />
+              <strong>Di sinilah AI Influencer bisa membantu.</strong>
+            </p>
+
+            <div className="hero-price-line">
+              <div className="hero-old">
+                EARLY BIRD
+                <strong>{money(s.early_bird_price)}</strong>
+                <span>{s.early_bird_status}</span>
+              </div>
+              <div className="hero-arrow">&rarr;</div>
+              <div className="hero-current">
+                <small>SEKARANG</small>
+                <strong>{now}</strong>
+              </div>
+            </div>
+
+            <div className="hero-actions">
+              <LeadGate className="sales-primary">
+                <span>MULAI AJA DULU</span>
+                <b>&rarr;</b>
+              </LeadGate>
+              <span className="hero-note">Pelajari workflow dari nol.</span>
+            </div>
+          </div>
+
+          <div className="hero-offer">
+            <div className="offer-badge">
+              <span>HARGA BATCH SEKARANG</span>
+              <b>{now}</b>
+            </div>
+
+            <div className="offer-price">
+              <del>{money(s.current_regular_price)}</del>
+              <strong>{now}</strong>
+            </div>
+
+            <div className="offer-next">
+              <span>NEXT BATCH</span>
+              <strong>{next}</strong>
+            </div>
+
+            {visitor.enabled ? <VisitorOffer /> : null}
+            {s.countdown_enabled ? <SalesCountdown minutes={s.countdown_minutes} /> : null}
+
+            <LeadGate className="offer-cta">
+              <span>MULAI AJA DULU &rarr;</span>
+              <span>&#8599;</span>
+            </LeadGate>
+
+            <p className="offer-footnote">Garansi bimbingan &middot; Free update materi</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="sales-urgency">
+        <div className="sales-container urgency-container">
+          <div className="urgency-mark">!</div>
+          <div>
+            <span>REALITA KARYAWAN</span>
+            <h2>Jangan sampai bikin konten terasa seperti pekerjaan kedua.</h2>
+            <p>
+              Kamu sudah menghabiskan sebagian besar hari untuk pekerjaan utama. Workflow yang tepat seharusnya
+              membuat proses konten lebih ringan, bukan menambah beban.
+            </p>
+          </div>
+          <div className="urgency-price">
+            <span>AKSES SEKARANG</span>
+            <strong>{now}</strong>
+            <small>&rarr; NEXT BATCH {next}</small>
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow" className="sales-section">
+        <div className="sales-container">
+          <div className="section-intro">
+            <span>01 / THE WORKFLOW</span>
+            <h2>
+              Yang kamu butuhkan
+              <br />
+              bukan lebih banyak tools.
+            </h2>
+            <p>
+              Kamu butuh workflow yang jelas. Dari membuat karakter AI sampai menghasilkan video yang siap diposting.
+            </p>
+          </div>
+
+          <div className="benefit-grid workflow-benefit-grid">
+            {STEPS.map(([title, text], i) => (
+              <article key={title} className="benefit-card">
+                <div className="card-index">{String(i + 1).padStart(2, "0")}</div>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="showcase" className="sales-section showcase-section">
+        <div className="sales-container">
+          <div className="section-intro">
+            <span>02 / SEE THE OUTPUT</span>
+            <h2>
+              Bukan cuma teori.
+              <br />
+              Lihat sendiri hasilnya.
+            </h2>
+            <p>
+              Beberapa contoh video dari materi workflow AI yang menjadi referensi bagaimana format konten bisa dibuat.
+            </p>
+          </div>
+          <VideoShowcase />
+        </div>
+      </section>
+
+      <section className="sales-section">
+        <div className="sales-container">
+          <div className="bonus-layout">
+            <div className="section-intro">
+              <span>03 / WHY THIS WORKFLOW</span>
+              <h2>
+                Kamu nggak perlu
+                <br />
+                langsung jago.
+              </h2>
+              <p>Yang penting kamu punya urutan kerja yang bisa diikuti.</p>
+            </div>
+
+            <div className="bonus-stack">
+              {PERKS.map(([icon, title, text]) => (
+                <article key={title} className="bonus-card">
+                  <div className="bonus-icon">{icon}</div>
+                  <div>
+                    <h3>{title}</h3>
+                    <p>{text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="sales-final">
+        <div className="sales-container final-container">
+          <div>
+            <span>THE DECISION</span>
+            <h2>
+              Kalau selama ini
+              <br />
+              kamu selalu bilang,
+              <br />
+              <span className="final-accent">&ldquo;nanti kalau sudah siap.&rdquo;</span>
+            </h2>
+            <p>
+              Mungkin kamu nggak butuh lebih banyak motivasi. Kamu cuma butuh cara yang lebih masuk akal untuk mulai.
+              <br />
+              <br />
+              Kerja tetap jalan. Konten juga mulai jalan.
+            </p>
+
+            <div className="final-price">
+              <div>
+                <small>HARGA SEKARANG</small>
+                <strong>{now}</strong>
+              </div>
+              {visitor.enabled ? (
+                <div>
+                  <small>SETELAH WINDOW</small>
+                  <strong className="visitor-final-price">{money(visitor.afterPrice)}</strong>
+                </div>
+              ) : null}
+              <div>
+                <small>NEXT BATCH</small>
+                <strong className="next">{next}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="final-cta-box">
+            {s.countdown_enabled ? <SalesCountdown minutes={s.countdown_minutes} /> : null}
+            <LeadGate className="sales-primary final-cta">
+              <span>MULAI AJA DULU &rarr;</span>
+              <b>&rarr;</b>
+            </LeadGate>
+            <small>
+              Checkout melalui halaman resmi.
+              <br />
+              Garansi bimbingan &middot; Free update materi.
+            </small>
+          </div>
+        </div>
+      </section>
+
+      <footer className="sales-footer">
+        <div className="sales-container">
+          <div>
+            <strong>RIZMAGO</strong>
+            <span>LAB STUDIO</span>
+          </div>
+          <small>AI INFLUENCER / CONTENT WORKFLOW</small>
+        </div>
+      </footer>
+    </main>
+  );
+}

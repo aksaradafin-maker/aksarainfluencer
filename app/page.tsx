@@ -1,69 +1,332 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import type { CSSProperties } from "react";
+import "./landing.css";
 
-export default function Home() {
+import { db } from "@/lib/db";
+import SalesCountdown from "./components/SalesCountdown";
+import VideoShowcase from "./components/VideoShowcase";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "AI Influencer Workflow — Rizmago Lab Studio",
+  description:
+    "Workflow membuat AI Influencer sampai menjadi video yang siap diposting.",
+};
+
+type Settings = {
+  early_bird_price: number;
+  early_bird_status: string;
+  current_price: number;
+  current_regular_price: number;
+  next_batch_price: number;
+  countdown_enabled: number;
+  countdown_minutes: number;
+  accent_color: string;
+  danger_color: string;
+  background_color: string;
+};
+
+const money = (v: number) =>
+  new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(Number(v || 0));
+
+async function getSettings() {
+  const [rows] = await db.query(
+    "SELECT * FROM sales_page_settings WHERE is_published = 1 ORDER BY id ASC LIMIT 1"
+  );
+
+  return (Array.isArray(rows) ? rows[0] : undefined) as
+    | Settings
+    | undefined;
+}
+
+const steps = [
+  {
+    n: "01",
+    title: "CREATE",
+    text: "Bikin karakter AI Influencer yang bisa kamu gunakan secara konsisten.",
+  },
+  {
+    n: "02",
+    title: "SETUP",
+    text: "Siapkan produk, konsep, script, visual, dan format konten.",
+  },
+  {
+    n: "03",
+    title: "GENERATE",
+    text: "Ikuti workflow untuk mengubah konsep menjadi video AI.",
+  },
+  {
+    n: "04",
+    title: "PUBLISH",
+    text: "Siapkan output untuk TikTok, Reels, Shorts, dan platform lainnya.",
+  },
+];
+
+export default async function HomePage() {
+  const s = await getSettings();
+
+  if (!s) {
+    return <main className="new-landing">Sales page belum dipublish.</main>;
+  }
+
+  const style = {
+    "--accent": s.accent_color || "#ff5757",
+    "--danger": s.danger_color || "#ff5757",
+    "--bg": s.background_color || "#07090d",
+  } as CSSProperties;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="new-landing" style={style}>
+
+      {/* NAV */}
+      <nav className="new-nav">
+        <a href="/" className="new-logo">
+          <strong>RIZMAGO</strong>
+          <span>LAB STUDIO</span>
+        </a>
+
+        <a href="/lead-gate" className="nav-cta">
+          MULAI BIKIN AI →
+        </a>
+      </nav>
+
+      {/* HERO */}
+      <section className="new-hero">
+        <div className="hero-pill">AI INFLUENCER WORKFLOW</div>
+
+        <h1>
+          MAU NGONTEN,
+          <br />
+          <em>TAPI HIDUP LO UDAH CUKUP SIBUK?</em>
+        </h1>
+
+        <p className="hero-lead">
+          Kerja 9–5. Pulang capek. Nggak punya kamera.
+          <br />
+          Nggak pede tampil terus di depan kamera.
+          <br />
+          Tapi tetap pengen mulai bikin konten.
+        </p>
+
+        <p className="hero-sub">
+          Sekarang kamu bisa bikin konten dengan
+          <strong> AI Influencer.</strong>
+          <br />
+          Bukan sekadar generate gambar.
+          Pelajari workflow dari karakter AI sampai video siap posting.
+        </p>
+
+        <a href="/lead-gate" className="hero-button">
+          MULAI BIKIN KONTEN <span>→</span>
+        </a>
+
+        <div className="hero-note">
+          workflow praktikal · tools gratis & berbayar · praktik dari nol
+        </div>
+      </section>
+
+      {/* PAIN */}
+      <section className="center-section pain-section">
+        <span className="eyebrow">REALITA</span>
+
+        <h2>
+          Yang bikin susah bukan
+          <br />
+          <span>niatnya.</span>
+        </h2>
+
+        <div className="pain-grid">
+          <article>
+            <b>01</b>
+            <h3>Nggak punya waktu</h3>
+            <p>
+              Kerja 9–5 sudah makan sebagian besar energi. Mau ngonten malah
+              keburu capek.
+            </p>
+          </article>
+
+          <article>
+            <b>02</b>
+            <h3>Nggak punya kamera</h3>
+            <p>
+              Nggak harus langsung beli kamera, lighting, atau bikin studio
+              sendiri.
+            </p>
+          </article>
+
+          <article>
+            <b>03</b>
+            <h3>Malu tampil</h3>
+            <p>
+              Pengen bikin personal brand tapi belum nyaman muncul di kamera
+              setiap hari.
+            </p>
+          </article>
+
+          <article>
+            <b>04</b>
+            <h3>Nggak tahu mulai dari mana</h3>
+            <p>
+              Tool ada di mana-mana. Tutorial juga banyak. Tapi alurnya nggak
+              jelas.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      {/* SOLUTION */}
+      <section id="workflow" className="center-section solution-section">
+        <span className="eyebrow">THE IDEA</span>
+
+        <h2>
+          Kamu nggak butuh
+          <br />
+          <span>lebih banyak tools.</span>
+        </h2>
+
+        <p className="section-lead">
+          Kamu butuh workflow yang jelas.
+          <br />
+          Dari bikin karakter AI sampai menjadi video yang siap digunakan.
+        </p>
+
+        <div className="workflow-grid">
+          {steps.map((step) => (
+            <article key={step.n}>
+              <span>{step.n}</span>
+              <h3>{step.title}</h3>
+              <p>{step.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* VIDEO */}
+      <section id="showcase" className="center-section showcase-section">
+        <span className="eyebrow">SEE THE OUTPUT</span>
+
+        <h2>
+          Bukan cuma teori.
+          <br />
+          <span>Lihat hasilnya.</span>
+        </h2>
+
+        <p className="section-lead">
+          Contoh video dari workflow AI Influencer, UGC, Commercial,
+          sampai short-form content.
+        </p>
+
+        <VideoShowcase />
+      </section>
+
+      {/* AI INFLUENCER */}
+      <section className="center-section influencer-section">
+        <span className="eyebrow">AI INFLUENCER</span>
+
+        <h2>
+          Bikin versi digital
+          <br />
+          <span>dari dirimu.</span>
+        </h2>
+
+        <p className="section-lead">
+          Jadi kamu nggak harus selalu berdiri di depan kamera untuk mulai
+          membangun konten.
+        </p>
+
+        <div className="format-list">
+          <span>AI UGC</span>
+          <span>PRODUCT VIDEO</span>
+          <span>SHORT VIDEO</span>
+          <span>COMMERCIAL</span>
+          <span>TALKING AI</span>
+          <span>AI INFLUENCER</span>
+        </div>
+      </section>
+
+      {/* OFFER */}
+      <section className="offer-section">
+        <div className="offer-box">
+
+          <span className="eyebrow">MULAI SEKARANG</span>
+
+          <h2>
+            Jangan tunggu
+            <br />
+            sampai “siap”.
+          </h2>
+
+          <p>
+            Mulai dari workflow yang sederhana.
+            <br />
+            Tools bisa berkembang belakangan.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
+
+          <div className="price-area">
+            <div className="sold">
+              <span>EARLY BIRD</span>
+              <del>{money(s.early_bird_price)}</del>
+              <b>{s.early_bird_status || "SOLD OUT"}</b>
+            </div>
+
+            <div className="current-price">
+              <small>HARGA SEKARANG</small>
+              <strong>{money(s.current_price)}</strong>
+              <del>{money(s.current_regular_price)}</del>
+            </div>
+
+            <div className="next-price">
+              <small>NEXT BATCH</small>
+              <strong>{money(s.next_batch_price)}</strong>
+            </div>
+          </div>
+
+          {s.countdown_enabled ? (
+            <SalesCountdown minutes={s.countdown_minutes} />
+          ) : null}
+
+          <a href="/lead-gate" className="offer-button">
+            MULAI AJA DULU →
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+          <div className="offer-trust">
+            <span>🛡️ Garansi Bimbingan</span>
+            <span>↻ Free Update Materi</span>
+            <span>AI Influencer Workflow</span>
+          </div>
         </div>
-      </main>
-    </div>
+      </section>
+
+      {/* FINAL */}
+      <section className="final-section">
+        <span className="eyebrow">YOUR TURN</span>
+
+        <h2>
+          Kerja tetap jalan.
+          <br />
+          <span>Konten juga mulai jalan.</span>
+        </h2>
+
+        <p>
+          Nggak perlu nunggu punya kamera.
+          <br />
+          Nggak perlu nunggu punya waktu luang sempurna.
+        </p>
+
+        <a href="/lead-gate" className="hero-button">
+          MULAI BIKIN AI →
+        </a>
+      </section>
+
+      <footer className="new-footer">
+        <strong>RIZMAGO LAB STUDIO</strong>
+        <span>AI INFLUENCER / CONTENT WORKFLOW</span>
+      </footer>
+    </main>
   );
 }

@@ -1,0 +1,540 @@
+.admin-lessons {
+  min-height: 100vh;
+  background: #07080c;
+  color: #f5f5f5;
+}
+
+.admin-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  min-height: 72px;
+  padding: 0 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border-bottom: 1px solid rgba(255,255,255,.08);
+
+  background: rgba(7,8,12,.92);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.admin-brand {
+  color: #fff;
+  text-decoration: none;
+
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .12em;
+}
+
+.admin-brand span {
+  opacity: .4;
+}
+
+.admin-back {
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-back:hover {
+  color: #fff;
+}
+
+.admin-container {
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 72px 0 110px;
+}
+
+.admin-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 40px;
+  margin-bottom: 58px;
+}
+
+.admin-eyebrow {
+  display: block;
+
+  margin-bottom: 14px;
+
+  color: rgba(255,255,255,.38);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .16em;
+}
+
+.admin-hero h1,
+.editor-heading h1 {
+  margin: 0;
+
+  font-size: clamp(38px,5vw,64px);
+  line-height: .95;
+  letter-spacing: -.045em;
+}
+
+.admin-hero p,
+.editor-heading > div > p {
+  max-width: 650px;
+
+  margin: 22px 0 0;
+
+  color: rgba(255,255,255,.5);
+
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.admin-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.admin-count strong {
+  font-family: monospace;
+  font-size: 42px;
+  line-height: 1;
+}
+
+.admin-count span {
+  margin-top: 8px;
+
+  color: rgba(255,255,255,.3);
+
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+.lesson-admin-list {
+  border-top: 1px solid rgba(255,255,255,.12);
+}
+
+.lesson-admin-list__header,
+.lesson-admin-row {
+  display: grid;
+  grid-template-columns: 2.2fr 1.6fr .8fr 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.lesson-admin-list__header {
+  min-height: 48px;
+
+  color: rgba(255,255,255,.28);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .15em;
+}
+
+.lesson-admin-row {
+  min-height: 150px;
+
+  border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.lesson-admin-number {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.lesson-admin-number > span {
+  color: rgba(255,255,255,.18);
+
+  font-family: monospace;
+  font-size: 27px;
+}
+
+.lesson-admin-number small {
+  color: rgba(255,255,255,.34);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.lesson-admin-number h2 {
+  margin: 7px 0 0;
+
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.lesson-admin-number p {
+  max-width: 400px;
+
+  margin: 8px 0 0;
+
+  color: rgba(255,255,255,.35);
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.lesson-admin-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.lesson-admin-content span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 8px;
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  color: rgba(255,255,255,.4);
+
+  font-size: 8px;
+  letter-spacing: .06em;
+}
+
+.lesson-admin-content b {
+  color: rgba(255,255,255,.75);
+}
+
+.lesson-status {
+  display: inline-block;
+
+  padding: 6px 9px;
+
+  border: 1px solid rgba(255,255,255,.12);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lesson-status--published {
+  color: rgba(150,230,180,.8);
+  border-color: rgba(120,220,160,.18);
+}
+
+.lesson-status--draft {
+  color: rgba(255,210,130,.75);
+  border-color: rgba(255,210,130,.15);
+}
+
+.lesson-edit-button {
+  color: #fff;
+  text-decoration: none;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.lesson-edit-button:hover {
+  opacity: .6;
+}
+
+.editor-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 48px;
+}
+
+.editor-topbar a {
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+
+  font-size: 12px;
+}
+
+.editor-topbar span {
+  color: rgba(255,255,255,.28);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.editor-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  gap: 40px;
+  margin-bottom: 70px;
+}
+
+.editor-heading-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.editor-heading-meta > span:first-child {
+  color: rgba(255,255,255,.35);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+
+.editor-section {
+  padding: 48px 0;
+
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.editor-section-heading {
+  display: flex;
+  gap: 24px;
+
+  margin-bottom: 34px;
+}
+
+.editor-section-heading > span {
+  color: rgba(255,255,255,.2);
+
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.editor-section-heading h2 {
+  margin: 0;
+
+  font-size: 20px;
+  letter-spacing: -.02em;
+}
+
+.editor-section-heading p {
+  margin: 8px 0 0;
+
+  color: rgba(255,255,255,.38);
+
+  font-size: 13px;
+}
+
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 24px;
+}
+
+.editor-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 9px;
+}
+
+.editor-field--full {
+  grid-column: 1 / -1;
+}
+
+.editor-field > span {
+  color: rgba(255,255,255,.3);
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.editor-field input,
+.editor-field textarea,
+.editor-field select {
+  width: 100%;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(255,255,255,.1);
+
+  background: rgba(255,255,255,.025);
+  color: #fff;
+
+  padding: 13px 15px;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 13px;
+}
+
+.editor-field textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.editor-field select {
+  appearance: none;
+}
+
+.editor-field input:focus,
+.editor-field textarea:focus,
+.editor-field select:focus {
+  border-color: rgba(255,255,255,.3);
+}
+
+.editor-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  margin-bottom: 24px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  background: #000;
+}
+
+.editor-video iframe {
+  width: 100%;
+  height: 100%;
+
+  border: 0;
+}
+
+.content-editor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.content-editor-card {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 20px;
+
+  padding: 22px;
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  background: rgba(255,255,255,.018);
+}
+
+.content-editor-number {
+  color: rgba(255,255,255,.2);
+
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.content-editor-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.quiz-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  gap: 20px;
+
+  padding-top: 40px;
+
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.editor-footer a {
+  color: rgba(255,255,255,.42);
+  text-decoration: none;
+
+  font-size: 12px;
+}
+
+.save-button {
+  border: 1px solid rgba(255,255,255,.18);
+
+  background: #fff;
+  color: #07080c;
+
+  padding: 13px 18px;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.editor-empty {
+  padding-top: 100px;
+}
+
+.editor-empty h1 {
+  margin: 0 0 20px;
+}
+
+.editor-empty a {
+  color: #fff;
+}
+
+@media (max-width: 850px) {
+
+  .admin-header {
+    padding: 0 20px;
+  }
+
+  .admin-container {
+    width: calc(100% - 32px);
+    padding-top: 48px;
+  }
+
+  .admin-hero,
+  .editor-heading {
+    display: block;
+  }
+
+  .admin-count {
+    align-items: flex-start;
+    margin-top: 30px;
+  }
+
+  .lesson-admin-list__header {
+    display: none;
+  }
+
+  .lesson-admin-row {
+    display: block;
+    padding: 28px 0;
+  }
+
+  .lesson-admin-content,
+  .lesson-status,
+  .lesson-edit-button {
+    margin-top: 18px;
+  }
+
+  .editor-heading-meta {
+    margin-top: 28px;
+  }
+
+  .editor-grid,
+  .quiz-options {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-field--full {
+    grid-column: auto;
+  }
+}

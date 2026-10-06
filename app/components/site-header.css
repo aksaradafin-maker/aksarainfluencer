@@ -1,0 +1,234 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  background: rgba(7,8,10,.86);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.app-header-inner {
+  width: min(100% - 40px, 1280px);
+  min-height: 68px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+}
+
+.app-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 155px;
+  text-decoration: none;
+}
+
+.app-brand-main {
+  color: #f1f3f6;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.app-brand-sub {
+  color: #687180;
+  font-family: "Space Mono", monospace;
+  font-size: 7px;
+  letter-spacing: .22em;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+}
+
+.app-nav a {
+  color: #727b8a;
+  font-family: "Space Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-decoration: none;
+  transition: color .2s ease;
+}
+
+.app-nav a:hover {
+  color: #f0f2f5;
+}
+
+.app-header-user {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.app-user-loading {
+  color: #515a68;
+  font-family: "Space Mono", monospace;
+  font-size: 8px;
+  letter-spacing: .12em;
+}
+
+.app-user-menu {
+  position: relative;
+}
+
+.app-user-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 4px 8px 4px 5px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.025);
+  color: #dce0e5;
+  cursor: pointer;
+}
+
+.app-user-button:hover {
+  border-color: rgba(255,255,255,.18);
+  background: rgba(255,255,255,.05);
+}
+
+.app-user-avatar {
+  width: 29px;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8ebef;
+  color: #08090b;
+  font-family: "Space Mono", monospace;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.app-user-name {
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "Space Mono", monospace;
+  font-size: 9px;
+}
+
+.app-user-chevron {
+  color: #687180;
+  font-family: "Space Mono", monospace;
+  font-size: 12px;
+}
+
+.app-user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 230px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: #0d0f13;
+  box-shadow: 0 18px 50px rgba(0,0,0,.4);
+}
+
+.app-user-dropdown-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.app-user-dropdown-info strong {
+  color: #edf0f3;
+  font-size: 13px;
+}
+
+.app-user-dropdown-info span {
+  overflow: hidden;
+  color: #697280;
+  font-family: "Space Mono", monospace;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-user-dropdown a,
+.app-user-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  background: transparent;
+  color: #aeb5bf;
+  font-family: "Space Mono", monospace;
+  font-size: 9px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.app-user-dropdown a:hover,
+.app-user-dropdown button:hover {
+  background: rgba(255,255,255,.06);
+  color: #fff;
+}
+
+.app-auth-links {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.app-auth-links a {
+  color: #aeb5bf;
+  font-family: "Space Mono", monospace;
+  font-size: 9px;
+  text-decoration: none;
+}
+
+.app-auth-links a:hover {
+  color: #fff;
+}
+
+.app-auth-links .app-register-link {
+  padding: 9px 13px;
+  border: 1px solid rgba(255,255,255,.14);
+  color: #e8ebef;
+}
+
+@media (max-width: 760px) {
+  .app-header-inner {
+    width: min(100% - 24px, 1280px);
+    min-height: 62px;
+    gap: 14px;
+  }
+
+  .app-brand {
+    min-width: auto;
+  }
+
+  .app-brand-main {
+    font-size: 13px;
+  }
+
+  .app-nav {
+    display: none;
+  }
+
+  .app-user-name {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .app-header-inner {
+    justify-content: space-between;
+  }
+
+  .app-brand-sub {
+    font-size: 6px;
+  }
+}

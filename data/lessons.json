@@ -1,0 +1,224 @@
+[
+  {
+    "slug": "fondasi",
+    "number": "01",
+    "chapter": "FONDASI",
+    "title": "Fondasi",
+    "description": "Bangun dasar yang jelas sebelum masuk ke proses produksi dan pengembangan konten.",
+    "videoId": "6z2egU-Xei4",
+    "videoUrl": "https://www.youtube.com/watch?v=6z2egU-Xei4",
+    "status": "published",
+    "material": [
+      {
+        "id": 1,
+        "title": "Material 01",
+        "content": "Konten material untuk Lesson 01 belum dipindahkan ke content database."
+      },
+      {
+        "id": 2,
+        "title": "Material 02",
+        "content": "Konten material untuk Lesson 01 belum dipindahkan ke content database."
+      },
+      {
+        "id": 3,
+        "title": "Material 03",
+        "content": "Konten material untuk Lesson 01 belum dipindahkan ke content database."
+      }
+    ],
+    "flashcards": [
+      {
+        "id": 1,
+        "question": "Flashcard source 01",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 2,
+        "question": "Flashcard source 02",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 3,
+        "question": "Flashcard source 03",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 4,
+        "question": "Flashcard source 04",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 5,
+        "question": "Flashcard source 05",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      }
+    ],
+    "quiz": [
+      {
+        "id": 1,
+        "question": "Quiz question 01",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 2,
+        "question": "Quiz question 02",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 3,
+        "question": "Quiz question 03",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 4,
+        "question": "Quiz question 04",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 5,
+        "question": "Quiz question 05",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      }
+    ]
+  },
+  {
+    "slug": "target-audience",
+    "number": "02",
+    "chapter": "BRAND & TARGET",
+    "title": "Menentukan Target Audience",
+    "description": "Memahami siapa yang ingin kamu bantu agar arah konten menjadi lebih jelas.",
+    "videoId": "BLkvC-dlSV4",
+    "videoUrl": "https://www.youtube.com/watch?v=BLkvC-dlSV4",
+    "status": "published",
+    "material": [
+      {
+        "id": 1,
+        "title": "Material 01",
+        "content": "Konten material untuk Lesson 02 belum dipindahkan ke content database."
+      },
+      {
+        "id": 2,
+        "title": "Material 02",
+        "content": "Konten material untuk Lesson 02 belum dipindahkan ke content database."
+      },
+      {
+        "id": 3,
+        "title": "Material 03",
+        "content": "Konten material untuk Lesson 02 belum dipindahkan ke content database."
+      }
+    ],
+    "flashcards": [
+      {
+        "id": 1,
+        "question": "Flashcard source 01",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 2,
+        "question": "Flashcard source 02",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 3,
+        "question": "Flashcard source 03",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 4,
+        "question": "Flashcard source 04",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      },
+      {
+        "id": 5,
+        "question": "Flashcard source 05",
+        "answer": "Jawaban dari source canonical akan ditempatkan di sini."
+      }
+    ],
+    "quiz": [
+      {
+        "id": 1,
+        "question": "Quiz question 01",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 2,
+        "question": "Quiz question 02",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 3,
+        "question": "Quiz question 03",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 4,
+        "question": "Quiz question 04",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "id": 5,
+        "question": "Quiz question 05",
+        "options": [
+          "Option A",
+          "Option B",
+          "Option C",
+          "Option D"
+        ],
+        "correctAnswer": 0
+      }
+    ]
+  }
+]
