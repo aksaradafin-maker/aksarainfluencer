@@ -37,8 +37,7 @@ const money = (v: number) =>
 
 async function getSettings() {
   const data = await appsScriptGet<{ settings?: Settings | null }>({
-    action: "get_sales_page",
-    published: "true",
+    action: "settings",
   });
 
   return data.settings ?? undefined;
