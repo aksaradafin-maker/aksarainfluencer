@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import "./landing.css";
 
-import { db } from "@/lib/db";
+import { appsScriptGet } from "@/lib/apps-script";
 import SalesCountdown from "./components/SalesCountdown";
 import VideoShowcase from "./components/VideoShowcase";
 
@@ -35,13 +36,12 @@ const money = (v: number) =>
   }).format(Number(v || 0));
 
 async function getSettings() {
-  const [rows] = await db.query(
-    "SELECT * FROM sales_page_settings WHERE is_published = 1 ORDER BY id ASC LIMIT 1"
-  );
+  const data = await appsScriptGet<{ settings?: Settings | null }>({
+    action: "get_sales_page",
+    published: "true",
+  });
 
-  return (Array.isArray(rows) ? rows[0] : undefined) as
-    | Settings
-    | undefined;
+  return data.settings ?? undefined;
 }
 
 const steps = [
@@ -85,10 +85,10 @@ export default async function HomePage() {
 
       {/* NAV */}
       <nav className="new-nav">
-        <a href="/" className="new-logo">
+        <Link href="/" className="new-logo">
           <strong>RIZMAGO</strong>
           <span>LAB STUDIO</span>
-        </a>
+        </Link>
 
         <a href="/lead-gate" className="nav-cta">
           MULAI BIKIN AI →

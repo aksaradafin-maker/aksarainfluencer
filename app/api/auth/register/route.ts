@@ -1,116 +1,21 @@
 import { NextResponse } from "next/server";
-import {
-  createSession,
-  hashPassword,
-} from "@/lib/auth";
-import { db } from "@/lib/db";
+import { appsScriptPost } from "@/lib/apps-script";
+import { createSession } from "@/lib/auth";
 
-export async function POST(
-  request: Request
-) {
+export async function POST(request: Request) {
   try {
-    const body =
-      await request.json();
-
-    const name =
-      typeof body.name === "string"
-        ? body.name.trim()
-        : "";
-
-    const email =
-      typeof body.email === "string"
-        ? body.email
-            .trim()
-            .toLowerCase()
-        : "";
-
-    const password =
-      typeof body.password === "string"
-        ? body.password
-        : "";
-
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        {
-          error:
-            "Nama, email, dan password wajib diisi.",
-        },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < 8) {
-      return NextResponse.json(
-        {
-          error:
-            "Password minimal 8 karakter.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const [existing] =
-      await db.query<any[]>(
-        `
-          SELECT id
-          FROM users
-          WHERE email = ?
-          LIMIT 1
-        `,
-        [email]
-      );
-
-    if (existing.length > 0) {
-      return NextResponse.json(
-        {
-          error:
-            "Email sudah terdaftar.",
-        },
-        { status: 409 }
-      );
-    }
-
-    const [result] =
-      await db.execute<any>(
-        `
-          INSERT INTO users (
-            name,
-            email,
-            password_hash
-          )
-          VALUES (?, ?, ?)
-        `,
-        [
-          name,
-          email,
-          hashPassword(password),
-        ]
-      );
-
-    await createSession(
-      result.insertId
-    );
-
-    return NextResponse.json(
-      {
-        success: true,
-        user: {
-          id: result.insertId,
-          name,
-          email,
-        },
-      },
-      { status: 201 }
-    );
+    const body = await request.json();
+    const name = String(body.name || "").trim();
+    const email = String(body.email || "").trim().toLowerCase();
+    const password = String(body.password || "");
+    if (!name || !email || !password) return NextResponse.json({ success: false, error: "Nama, email, dan password wajib diisi." }, { status: 400 });
+    if (password.length < 6) return NextResponse.json({ success: false, error: "Password minimal 6 karakter." }, { status: 400 });
+    const result = await appsScriptPost<{ success: boolean; user?: { id: number; name: string; email: string; avatar?: string | null; role?: string } }>({ action: "register_user", name, email, password, whatsapp: body.whatsapp || "" });
+    if (!result.user) return NextResponse.json({ success: false, error: "Registrasi gagal." }, { status: 400 });
+    await createSession(Number(result.user.id));
+    return NextResponse.json({ success: true, user: { ...result.user, id: Number(result.user.id), role: result.user.role === "admin" ? "admin" : "user", avatar: result.user.avatar ?? null } });
   } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      {
-        error:
-          "Gagal membuat akun.",
-      },
-      { status: 500 }
-    );
+    console.error("REGISTER_ERROR:", error);
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : "Registrasi gagal." }, { status: 400 });
   }
 }

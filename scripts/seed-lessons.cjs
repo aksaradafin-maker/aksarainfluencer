@@ -1,5 +1,3 @@
-const mysql = require("mysql2/promise");
-
 const lessons = [
   {
     slug: "fondasi",
@@ -118,228 +116,23 @@ const lessons = [
 ];
 
 async function main() {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST || "127.0.0.1",
-    port: Number(process.env.DB_PORT || 3306),
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "creator_studio",
-  });
+  const { appsScriptPost } = await import("./apps-script-client.cjs");
+  for (const lesson of lessons) {
+    const result = await appsScriptPost({
+      action: "save_lesson",
+      slug: lesson.slug,
+      lesson,
+    });
 
-  try {
-    await connection.beginTransaction();
-
-    for (const lesson of lessons) {
-      // Cari lesson berdasarkan slug
-      const [existingRows] = await connection.execute(
-        `
-          SELECT id
-          FROM lessons
-          WHERE slug = ?
-          LIMIT 1
-        `,
-        [lesson.slug]
-      );
-
-      const existing = existingRows;
-
-      let lessonId;
-
-      if (existing.length) {
-        lessonId = existing[0].id;
-
-        await connection.execute(
-          `
-            UPDATE lessons
-            SET
-              lesson_number = ?,
-              chapter = ?,
-              title = ?,
-              description = ?,
-              video_id = ?,
-              video_url = ?,
-              status = ?
-            WHERE id = ?
-          `,
-          [
-            lesson.lessonNumber,
-            lesson.chapter,
-            lesson.title,
-            lesson.description,
-            lesson.videoId,
-            lesson.videoUrl,
-            lesson.status,
-            lessonId,
-          ]
-        );
-
-        // Bersihkan child data agar seed idempotent
-        await connection.execute(
-          `DELETE FROM flashcards WHERE lesson_id = ?`,
-          [lessonId]
-        );
-
-        await connection.execute(
-          `DELETE FROM materials WHERE lesson_id = ?`,
-          [lessonId]
-        );
-
-        await connection.execute(
-          `DELETE FROM quiz_questions WHERE lesson_id = ?`,
-          [lessonId]
-        );
-      } else {
-        const [result] = await connection.execute(
-          `
-            INSERT INTO lessons (
-              slug,
-              lesson_number,
-              chapter,
-              title,
-              description,
-              video_id,
-              video_url,
-              status
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-          `,
-          [
-            lesson.slug,
-            lesson.lessonNumber,
-            lesson.chapter,
-            lesson.title,
-            lesson.description,
-            lesson.videoId,
-            lesson.videoUrl,
-            lesson.status,
-          ]
-        );
-
-        lessonId = result.insertId;
-      }
-
-      // Flashcards
-      for (let i = 0; i < lesson.flashcards.length; i++) {
-        const card = lesson.flashcards[i];
-
-        await connection.execute(
-          `
-            INSERT INTO flashcards (
-              lesson_id,
-              sort_order,
-              question,
-              answer
-            )
-            VALUES (?, ?, ?, ?)
-          `,
-          [
-            lessonId,
-            i,
-            card.question,
-            card.answer,
-          ]
-        );
-      }
-
-      // Materials
-      for (let i = 0; i < lesson.materials.length; i++) {
-        const material = lesson.materials[i];
-
-        await connection.execute(
-          `
-            INSERT INTO materials (
-              lesson_id,
-              sort_order,
-              title,
-              content
-            )
-            VALUES (?, ?, ?, ?)
-          `,
-          [
-            lessonId,
-            i,
-            material.title,
-            material.content,
-          ]
-        );
-      }
-
-      // Quiz
-      for (let i = 0; i < lesson.quiz.length; i++) {
-        const quiz = lesson.quiz[i];
-
-        const [questionResult] = await connection.execute(
-          `
-            INSERT INTO quiz_questions (
-              lesson_id,
-              sort_order,
-              question
-            )
-            VALUES (?, ?, ?)
-          `,
-          [
-            lessonId,
-            i,
-            quiz.question,
-          ]
-        );
-
-        const questionId = questionResult.insertId;
-
-        let correctOptionId = null;
-
-        for (let j = 0; j < quiz.options.length; j++) {
-          const [optionResult] = await connection.execute(
-            `
-              INSERT INTO quiz_options (
-                question_id,
-                sort_order,
-                option_text
-              )
-              VALUES (?, ?, ?)
-            `,
-            [
-              questionId,
-              j,
-              quiz.options[j],
-            ]
-          );
-
-          if (j === quiz.correctAnswer) {
-            correctOptionId = optionResult.insertId;
-          }
-        }
-
-        if (correctOptionId !== null) {
-          await connection.execute(
-            `
-              UPDATE quiz_questions
-              SET correct_option_id = ?
-              WHERE id = ?
-            `,
-            [
-              correctOptionId,
-              questionId,
-            ]
-          );
-        }
-      }
-
-      console.log(
-        `Seeded: ${lesson.lessonNumber} / ${lesson.title}`
-      );
+    if (!result.lesson) {
+      throw new Error(`Apps Script tidak mengembalikan lesson ${lesson.slug}.`);
     }
 
-    await connection.commit();
-
-    console.log("");
-    console.log("SEED BERHASIL.");
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    await connection.end();
+    console.log(`Seeded: ${lesson.lessonNumber} / ${lesson.title}`);
   }
+
+  console.log("");
+  console.log("SEED BERHASIL.");
 }
 
 main().catch((error) => {

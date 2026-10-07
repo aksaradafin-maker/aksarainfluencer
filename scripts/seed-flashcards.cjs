@@ -1,13 +1,3 @@
-const mysql = require("mysql2/promise");
-
-const DB_CONFIG = {
-  host: "127.0.0.1",
-  port: 3306,
-  user: "root",
-  password: "",
-  database: "creator_studio",
-};
-
 const decks = {
   "fondasi": [
     {
@@ -264,84 +254,36 @@ const decks = {
 };
 
 async function main() {
-  const connection = await mysql.createConnection(DB_CONFIG);
+  const { appsScriptGet, appsScriptPost } = await import("./apps-script-client.cjs");
+  let totalInserted = 0;
+  const summary = [];
 
-  try {
-    await connection.beginTransaction();
+  for (const [slug, cards] of Object.entries(decks)) {
+    const result = await appsScriptGet({ action: "get_lesson", slug });
 
-    let totalInserted = 0;
-
-    for (const [slug, cards] of Object.entries(decks)) {
-      const [lessons] = await connection.execute(
-        "SELECT id, title FROM lessons WHERE slug = ? LIMIT 1",
-        [slug]
-      );
-
-      if (!lessons.length) {
-        console.log(`SKIP: lesson '${slug}' tidak ditemukan.`);
-        continue;
-      }
-
-      const lessonId = lessons[0].id;
-
-      await connection.execute(
-        "DELETE FROM flashcards WHERE lesson_id = ?",
-        [lessonId]
-      );
-
-      for (let i = 0; i < cards.length; i++) {
-        await connection.execute(
-          `INSERT INTO flashcards
-            (lesson_id, sort_order, question, answer)
-           VALUES (?, ?, ?, ?)`,
-          [
-            lessonId,
-            i + 1,
-            cards[i].question,
-            cards[i].answer,
-          ]
-        );
-
-        totalInserted++;
-      }
-
-      console.log(
-        `OK: ${slug} — ${cards.length} flashcard`
-      );
+    if (!result.lesson) {
+      console.log(`SKIP: lesson '${slug}' tidak ditemukan.`);
+      continue;
     }
 
-    await connection.commit();
+    const saved = await appsScriptPost({
+      action: "save_lesson",
+      slug,
+      lesson: { ...result.lesson, flashcards: cards },
+    });
 
-    console.log("");
-    console.log(`TOTAL FLASHCARD: ${totalInserted}`);
-    console.log("");
-
-    const [rows] = await connection.execute(`
-      SELECT
-        l.lesson_number,
-        l.slug,
-        l.title,
-        COUNT(f.id) AS flashcards
-      FROM lessons l
-      LEFT JOIN flashcards f
-        ON f.lesson_id = l.id
-      GROUP BY
-        l.id,
-        l.lesson_number,
-        l.slug,
-        l.title
-      ORDER BY l.lesson_number
-    `);
-
-    console.table(rows);
-  } catch (error) {
-    await connection.rollback();
-    console.error("SEED GAGAL:");
-    console.error(error);
-    process.exitCode = 1;
-  } finally {
-    await connection.end();
+    totalInserted += cards.length;
+    summary.push({
+      slug,
+      title: saved.lesson?.title ?? result.lesson.title,
+      flashcards: cards.length,
+    });
+    console.log(`OK: ${slug} — ${cards.length} flashcard`);
   }
+
+  console.log("");
+  console.log(`TOTAL FLASHCARD: ${totalInserted}`);
+  console.table(summary);
 }
 
 main();

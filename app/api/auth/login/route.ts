@@ -1,93 +1,19 @@
 import { NextResponse } from "next/server";
-import {
-  createSession,
-  hashPassword,
-} from "@/lib/auth";
-import { db } from "@/lib/db";
+import { appsScriptPost } from "@/lib/apps-script";
+import { createSession } from "@/lib/auth";
 
-export async function POST(
-  request: Request
-) {
+export async function POST(request: Request) {
   try {
-    const body =
-      await request.json();
-
-    const email =
-      typeof body.email === "string"
-        ? body.email
-            .trim()
-            .toLowerCase()
-        : "";
-
-    const password =
-      typeof body.password === "string"
-        ? body.password
-        : "";
-
-    if (!email || !password) {
-      return NextResponse.json(
-        {
-          error:
-            "Email dan password wajib diisi.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const [rows] =
-      await db.query<any[]>(
-        `
-          SELECT
-            id,
-            name,
-            email,
-            avatar,
-            password_hash
-          FROM users
-          WHERE email = ?
-          LIMIT 1
-        `,
-        [email]
-      );
-
-    const user = rows[0];
-
-    if (
-      !user ||
-      user.password_hash !==
-        hashPassword(password)
-    ) {
-      return NextResponse.json(
-        {
-          error:
-            "Email atau password salah.",
-        },
-        { status: 401 }
-      );
-    }
-
-    await createSession(
-      user.id
-    );
-
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-      },
-    });
+    const body = await request.json();
+    const email = String(body.email || "").trim().toLowerCase();
+    const password = String(body.password || "");
+    if (!email || !password) return NextResponse.json({ success: false, error: "Email dan password wajib diisi." }, { status: 400 });
+    const result = await appsScriptPost<{ success: boolean; user?: { id: number; name: string; email: string; avatar?: string | null; role?: string } }>({ action: "login", email, password });
+    if (!result.user) return NextResponse.json({ success: false, error: "Email atau password salah." }, { status: 401 });
+    await createSession(Number(result.user.id));
+    return NextResponse.json({ success: true, user: { ...result.user, id: Number(result.user.id), role: result.user.role === "admin" ? "admin" : "user", avatar: result.user.avatar ?? null } });
   } catch (error) {
-    console.error(error);
-
-    return NextResponse.json(
-      {
-        error:
-          "Gagal login.",
-      },
-      { status: 500 }
-    );
+    console.error("LOGIN_ERROR:", error);
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : "Login gagal." }, { status: 401 });
   }
 }

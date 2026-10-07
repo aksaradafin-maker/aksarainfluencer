@@ -1,13 +1,3 @@
-const mysql = require("mysql2/promise");
-
-const DB_CONFIG = {
-  host: "127.0.0.1",
-  port: 3306,
-  user: "root",
-  password: "",
-  database: "creator_studio",
-};
-
 const lessons = [
   {
     slug: "riset-benchmarking",
@@ -82,69 +72,47 @@ const lessons = [
 ];
 
 async function main() {
-  const connection = await mysql.createConnection(DB_CONFIG);
+  const { appsScriptGet, appsScriptPost } = await import("./apps-script-client.cjs");
+  const rows = [];
 
-  try {
-    for (const lesson of lessons) {
-      const [existing] = await connection.execute(
-        "SELECT id FROM lessons WHERE slug = ? LIMIT 1",
-        [lesson.slug]
-      );
+  for (const lesson of lessons) {
+    const existing = await appsScriptGet({
+      action: "get_lesson",
+      slug: lesson.slug,
+    });
 
-      if (existing.length) {
-        console.log(`EXISTS: ${lesson.lessonNumber} — ${lesson.title}`);
-        continue;
-      }
-
-      await connection.execute(
-        `INSERT INTO lessons
-          (
-            slug,
-            lesson_number,
-            chapter,
-            title,
-            description,
-            video_id,
-            video_url,
-            status
-          )
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          lesson.slug,
-          lesson.lessonNumber,
-          lesson.chapter,
-          lesson.title,
-          lesson.description,
-          "",
-          "",
-          "draft",
-        ]
-      );
-
-      console.log(`CREATED: ${lesson.lessonNumber} — ${lesson.title}`);
+    if (existing.lesson) {
+      console.log(`EXISTS: ${lesson.lessonNumber} — ${lesson.title}`);
+      rows.push(existing.lesson);
+      continue;
     }
 
-    console.log("");
-    console.log("DAFTAR LESSON:");
+    const created = await appsScriptPost({
+      action: "save_lesson",
+      slug: lesson.slug,
+      lesson: {
+        ...lesson,
+        videoId: "",
+        videoUrl: "",
+        status: "draft",
+        flashcards: [],
+        materials: [],
+        quiz: [],
+      },
+    });
 
-    const [rows] = await connection.execute(`
-      SELECT
-        lesson_number,
-        slug,
-        title,
-        status
-      FROM lessons
-      ORDER BY CAST(lesson_number AS UNSIGNED)
-    `);
-
-    console.table(rows);
-  } catch (error) {
-    console.error("GAGAL:");
-    console.error(error);
-    process.exitCode = 1;
-  } finally {
-    await connection.end();
+    rows.push(created.lesson ?? lesson);
+    console.log(`CREATED: ${lesson.lessonNumber} — ${lesson.title}`);
   }
+
+  console.log("");
+  console.log("DAFTAR LESSON:");
+  console.table(rows.map(({ lessonNumber, slug, title, status }) => ({
+    lessonNumber,
+    slug,
+    title,
+    status,
+  })));
 }
 
 main();

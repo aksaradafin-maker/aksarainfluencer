@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
+import { appsScriptGet, appsScriptPost } from "@/lib/apps-script";
 
 type RouteContext = {
   params: Promise<{
     slug: string;
   }>;
+};
+
+type Attempt = {
+  id: number;
+  score: number;
+  passed: boolean;
+  attempt_date: string;
+  created_at: string;
 };
 
 type AttemptBody = {
@@ -13,71 +21,32 @@ type AttemptBody = {
 };
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: RouteContext
 ) {
   const { slug } = await params;
+  const sessionId = new URL(request.url).searchParams.get("sessionId") || "";
 
   try {
-    const [lessons] = await db.query<any[]>(
-      `
-        SELECT id
-        FROM lessons
-        WHERE slug = ?
-        LIMIT 1
-      `,
-      [slug]
-    );
+    const data = await appsScriptGet<{
+      lessonFound: boolean;
+      attempts?: Attempt[];
+      todayAttempt?: Attempt | null;
+    }>({
+      action: "get_quiz_attempts",
+      slug,
+      sessionId,
+    });
 
-    const lesson = lessons[0];
-
-    if (!lesson) {
+    if (!data.lessonFound) {
       return NextResponse.json(
-        {
-          error: "Lesson tidak ditemukan.",
-        },
+        { error: "Lesson tidak ditemukan." },
         { status: 404 }
       );
     }
 
-    const url = new URL(_request.url);
-    const sessionId =
-      url.searchParams.get("sessionId") || "";
-
-    if (!sessionId) {
-      return NextResponse.json({
-        attempts: [],
-        todayAttempt: null,
-        canAttempt: true,
-      });
-    }
-
-    const [attempts] = await db.query<any[]>(
-      `
-        SELECT
-          id,
-          score,
-          passed,
-          attempt_date,
-          created_at
-        FROM quiz_attempts
-        WHERE lesson_id = ?
-          AND session_id = ?
-        ORDER BY created_at DESC
-        LIMIT 20
-      `,
-      [lesson.id, sessionId]
-    );
-
-    const todayAttempt =
-      attempts.find(
-        (attempt) =>
-          String(attempt.attempt_date)
-            .slice(0, 10) ===
-          new Date()
-            .toISOString()
-            .slice(0, 10)
-      ) || null;
+    const attempts = data.attempts ?? [];
+    const todayAttempt = data.todayAttempt ?? null;
 
     return NextResponse.json({
       attempts,
@@ -86,11 +55,8 @@ export async function GET(
     });
   } catch (error) {
     console.error(error);
-
     return NextResponse.json(
-      {
-        error: "Gagal mengambil riwayat quiz.",
-      },
+      { error: "Gagal mengambil riwayat quiz." },
       { status: 500 }
     );
   }
@@ -103,127 +69,70 @@ export async function POST(
   const { slug } = await params;
 
   try {
-    const body =
-      (await request.json()) as AttemptBody;
-
-    const sessionId =
-      typeof body.sessionId === "string"
-        ? body.sessionId.trim()
-        : "";
-
-    const score =
-      typeof body.score === "number"
-        ? Math.round(body.score)
-        : -1;
+    const body = (await request.json()) as AttemptBody;
+    const sessionId = typeof body.sessionId === "string" ? body.sessionId.trim() : "";
+    const score = typeof body.score === "number" ? Math.round(body.score) : -1;
 
     if (!sessionId) {
       return NextResponse.json(
-        {
-          error: "Session ID wajib diisi.",
-        },
+        { error: "Session ID wajib diisi." },
         { status: 400 }
       );
     }
 
     if (score < 0 || score > 100) {
       return NextResponse.json(
-        {
-          error: "Score tidak valid.",
-        },
+        { error: "Score tidak valid." },
         { status: 400 }
       );
     }
 
-    const [lessons] = await db.query<any[]>(
-      `
-        SELECT id
-        FROM lessons
-        WHERE slug = ?
-        LIMIT 1
-      `,
-      [slug]
-    );
+    const data = await appsScriptPost<{
+      lessonFound: boolean;
+      alreadyAttempted?: boolean;
+      todayAttempt?: Attempt | null;
+      attempt?: Attempt;
+    }>({
+      action: "save_quiz_attempt",
+      slug,
+      sessionId,
+      score,
+    });
 
-    const lesson = lessons[0];
-
-    if (!lesson) {
+    if (!data.lessonFound) {
       return NextResponse.json(
-        {
-          error: "Lesson tidak ditemukan.",
-        },
+        { error: "Lesson tidak ditemukan." },
         { status: 404 }
       );
     }
 
-    const [existing] = await db.query<any[]>(
-      `
-        SELECT
-          id,
-          score,
-          passed,
-          attempt_date,
-          created_at
-        FROM quiz_attempts
-        WHERE lesson_id = ?
-          AND session_id = ?
-          AND attempt_date = CURDATE()
-        LIMIT 1
-      `,
-      [lesson.id, sessionId]
-    );
-
-    if (existing.length > 0) {
+    if (data.alreadyAttempted) {
       return NextResponse.json(
         {
-          error:
-            "Kamu sudah mengerjakan quiz hari ini.",
-          todayAttempt: existing[0],
+          error: "Kamu sudah mengerjakan quiz hari ini.",
+          todayAttempt: data.todayAttempt ?? null,
           canAttempt: false,
         },
         { status: 409 }
       );
     }
 
-    const passed = score >= 80 ? 1 : 0;
-
-    const [result] = await db.execute<any>(
-      `
-        INSERT INTO quiz_attempts (
-          lesson_id,
-          session_id,
-          score,
-          passed,
-          attempt_date
-        )
-        VALUES (?, ?, ?, ?, CURDATE())
-      `,
-      [
-        lesson.id,
-        sessionId,
-        score,
-        passed,
-      ]
-    );
+    if (!data.attempt) {
+      throw new Error("Google Apps Script did not return the saved attempt");
+    }
 
     return NextResponse.json(
       {
         success: true,
-        attempt: {
-          id: result.insertId,
-          score,
-          passed: Boolean(passed),
-        },
+        attempt: data.attempt,
         canAttempt: false,
       },
       { status: 201 }
     );
   } catch (error) {
     console.error(error);
-
     return NextResponse.json(
-      {
-        error: "Gagal menyimpan quiz attempt.",
-      },
+      { error: "Gagal menyimpan quiz attempt." },
       { status: 500 }
     );
   }
