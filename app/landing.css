@@ -546,3 +546,74 @@ a {
     font-size: 32px;
   }
 }
+/* SALES COUNTDOWN */
+.sales-countdown {
+  width: min(620px, 100%);
+  margin: 30px auto 26px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid rgba(255, 87, 87, 0.28);
+  border-radius: 20px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 87, 87, 0.10),
+      rgba(255, 87, 87, 0.035)
+    );
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.sales-countdown span {
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+}
+
+.sales-countdown strong {
+  color: var(--text);
+  font-family: monospace;
+  font-size: clamp(34px, 7vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.sales-countdown small {
+  max-width: 420px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.sales-countdown-expired {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.sales-countdown-expired span {
+  color: var(--muted);
+}
+
+.sales-countdown-expired strong {
+  color: var(--muted);
+  font-size: clamp(20px, 4vw, 30px);
+}
+
+@media (max-width: 520px) {
+  .sales-countdown {
+    margin-top: 24px;
+    padding: 18px 16px;
+  }
+
+  .sales-countdown strong {
+    font-size: 36px;
+  }
+}

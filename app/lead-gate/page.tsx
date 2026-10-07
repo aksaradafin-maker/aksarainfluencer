@@ -2,15 +2,13 @@
 
 import { FormEvent, useState } from "react";
 
-const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbz5OvT2U8Z3f7wXNLM4t5jSLcs-iFiEob7xYLlBG4Zl6PSpRfoB6OGdT8329rrDDGC6bA/exec";
-
-const LYNK_URL = "https://lynk.id/a/1911036127";
+const DEFAULT_LYNK_URL = "https://lynk.id/a/1911036127";
 
 export default function LeadGatePage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [lynkUrl, setLynkUrl] = useState(DEFAULT_LYNK_URL);
 
   async function submitLead(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -43,13 +41,14 @@ export default function LeadGatePage() {
 
       if (!response.ok || !result?.success) {
         throw new Error(
-          result?.error || "Data gagal dikirim ke Google Sheets."
+          result?.error || "Data gagal disimpan."
         );
       }
 
+      setLynkUrl(String(result?.offer?.lynk_url || DEFAULT_LYNK_URL));
       setSuccess(true);
     } catch {
-      setError("Data belum berhasil dikirim. Silakan coba lagi.");
+      setError("Data belum berhasil disimpan. Silakan coba lagi.");
     } finally {
       setLoading(false);
     }
@@ -286,7 +285,7 @@ export default function LeadGatePage() {
               checkout untuk menyelesaikan pembelian.
             </p>
 
-            <a href={LYNK_URL}>
+            <a href={lynkUrl}>
               LANJUT KE LYNK.ID →
             </a>
           </div>

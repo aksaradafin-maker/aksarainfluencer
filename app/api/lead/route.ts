@@ -1,52 +1,90 @@
+﻿import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
+import { getSalesSettings, supabaseAdmin } from "@/lib/supabase";
 
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5OvT2U8Z3f7wXNLM4t5jSLcsI-fiEob7xYLlBG4Zl6PSpRfoB6OGdT8329rrDDGC6bA/exec";
+function makeId(prefix: string) {
+  return `${prefix}_${randomUUID().replace(/-/g, "").slice(0, 16)}`;
+}
 
 export async function POST(request: Request) {
   try {
-    const payload = await request.json();
+    const payload = (await request.json()) as {
+      nama?: string;
+      whatsapp?: string;
+      email?: string;
+      source?: string;
+    };
 
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "text/plain;charset=utf-8",
-      },
-      body: JSON.stringify(payload),
-      cache: "no-store",
-    });
+    const nama = String(payload.nama ?? "").trim();
+    const whatsapp = String(payload.whatsapp ?? "").trim();
+    const email = String(payload.email ?? "").trim();
 
-    const text = await response.text();
-
-    if (!response.ok) {
+    if (!nama) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Google Apps Script menolak request.",
-          detail: text,
-        },
-        { status: 502 }
+        { success: false, error: "Nama wajib diisi." },
+        { status: 400 }
       );
     }
 
-    let data: unknown;
-
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = {
-        success: true,
-        raw: text,
-      };
+    if (!whatsapp) {
+      return NextResponse.json(
+        { success: false, error: "WhatsApp wajib diisi." },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json(data);
+    if (!email) {
+      return NextResponse.json(
+        { success: false, error: "Email wajib diisi." },
+        { status: 400 }
+      );
+    }
+
+    const settings = await getSalesSettings();
+    const timestamp = new Date();
+    const holdMinutes = settings.countdown_minutes || 30;
+
+    const heldUntil = new Date(
+      timestamp.getTime() + holdMinutes * 60 * 1000
+    );
+
+    const lead = {
+      id: makeId("lead"),
+      timestamp: timestamp.toISOString(),
+      nama,
+      whatsapp,
+      email,
+      harga_hold: settings.current_price,
+      price_held_until: heldUntil.toISOString(),
+      source: String(payload.source || "landing"),
+      status: "registered",
+    };
+
+    const { error } = await supabaseAdmin
+      .from("leads")
+      .insert(lead);
+
+    if (error) {
+      throw error;
+    }
+
+    return NextResponse.json({
+      success: true,
+      lead,
+      offer: {
+        harga_hold: settings.current_price,
+        price_held_until: heldUntil.toISOString(),
+        hold_minutes: holdMinutes,
+        lynk_url: settings.lynk_url,
+      },
+    });
   } catch (error) {
-    console.error("LEAD_PROXY_ERROR:", error);
+    console.error("LEAD_ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
-        error: "Gagal menghubungkan ke Google Apps Script.",
+        error: "Data belum berhasil disimpan.",
       },
       { status: 500 }
     );

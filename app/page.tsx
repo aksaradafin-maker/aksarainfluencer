@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 import Link from "next/link";
 import "./landing.css";
 
-import { appsScriptGet } from "@/lib/apps-script";
+import { getSalesSettings } from "@/lib/supabase";
 import SalesCountdown from "./components/SalesCountdown";
 import VideoShowcase from "./components/VideoShowcase";
 
@@ -36,11 +36,7 @@ const money = (v: number) =>
   }).format(Number(v || 0));
 
 async function getSettings() {
-  const data = await appsScriptGet<{ settings?: Settings | null }>({
-    action: "settings",
-  });
-
-  return data.settings ?? undefined;
+  return getSalesSettings();
 }
 
 const steps = [
